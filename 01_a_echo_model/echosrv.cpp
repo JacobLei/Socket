@@ -37,6 +37,13 @@ int main()
 	//servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");		// 指定地址  
 	//inet_aton("127.0.0.1", &servaddr.sin_addr);		// 指定地址
 
+	// 设置地址重复利用 REUSEADDR
+	int on = 1;
+	if( (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on))  < 0) )
+	{
+		ERR_EXIT("setsockopt");
+	} 
+
 	// 将套接字与地址绑定
 	if( bind(listenfd, (struct sockaddr*)(&servaddr), sizeof(servaddr)) < 0 )
 	{
@@ -57,6 +64,8 @@ int main()
 	{
 		ERR_EXIT("accept");
 	}
+	
+	printf("ip=%s, port=%d\n", inet_ntoa(peeraddr.sin_addr), ntohs(peeraddr.sin_port));	// 打印客服端发送过来的ip和port
 	
 	char recvbuf[1024];
 	while(true)
